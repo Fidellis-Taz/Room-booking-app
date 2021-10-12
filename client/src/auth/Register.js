@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { register } from "../api/auth";
 import { toast } from "react-toastify";
-
+import RegisterForm from "../components/RegisterForm";
 
 const Register = ({history}) => {
 
@@ -40,8 +40,7 @@ history.push("/login")
 
          </div>
 
-      <button className="btn btn-primary">Submit</button>
-
+    
         </form>
       );
     return (
@@ -49,7 +48,7 @@ history.push("/login")
         <div className="container-fluid bg-secondary p-5 text-center">
           <h1>Register</h1>
         </div>
-        {JSON.stringify([name,email,password])}
+    {/*     {JSON.stringify([name,email,password])} */}
 
         <div className="container">
           <div className="row">
