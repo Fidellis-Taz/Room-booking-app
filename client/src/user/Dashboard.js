@@ -1,16 +1,15 @@
+import DashboardNav from "../components/DashboardNav";
+import ConnectNav from "../components/ConnectNav";
 import { Link } from "react-router-dom";
 
-import DashboardNav from "../components/DashboardNav";
-import DashboardSubNav from "../components/DashboardSubNav";
-
 const Dashboard = () => {
-    return (
-      <>
-        <div className="container-fluid bg-secondary p-5">
-          <DashboardSubNav />
-        </div>
-        
-        <div className="container-fluid p-4">
+  return (
+    <>
+      <div className="container-fluid bg-secondary p-5">
+        <ConnectNav />
+      </div>
+
+      <div className="container-fluid p-4">
         <DashboardNav />
       </div>
 
@@ -26,9 +25,8 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
-      </>
-    );
-  };
-  
-  export default Dashboard;
-  
+    </>
+  );
+};
+
+export default Dashboard;
