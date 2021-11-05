@@ -1,16 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import { DatePicker, Select } from "antd";
-import { createHotel } from "../api/hotel";
+import { read, updateHotel } from "../api/hotel";
 import { useSelector } from "react-redux";
-import HotelCreateForm from "../components/forms/HotelCreateForm";
+import HotelEditForm from "../components/forms/HotelEditForm";
+
 const { Option } = Select;
 
-
-
-
-
-const NewHotel = () => {
+const EditHotel = ({ match }) => {
   // redux
   const { auth } = useSelector((state) => ({ ...state }));
   const { token } = auth;
@@ -18,26 +15,33 @@ const NewHotel = () => {
   const [values, setValues] = useState({
     title: "",
     content: "",
-    image: "",
+    location: "",
     price: "",
     from: "",
     to: "",
     bed: "",
   });
+  const [image, setImage] = useState("");
   const [preview, setPreview] = useState(
     "https://via.placeholder.com/100x100.png?text=PREVIEW"
   );
-  //because everytime we select location it overrides other values in the state 
-  //so we should add it in its on state value
-  const [location, setLocation] = useState("");
   // destructuring variables from state
-  const { title, content, image, price, from, to, bed } = values;
+  const { title, content, price, from, to, bed, location } = values;
+
+  useEffect(() => {
+    loadSellerHotel();
+  }, []);
+
+  const loadSellerHotel = async () => {
+    let res = await read(match.params.hotelId);
+    // spread out values and populate the values with res.data
+    setValues({ ...values, ...res.data });
+    setPreview(`${process.env.REACT_APP_API}/hotel/image/${res.data._id}`);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // console.log(values);
-    // console.log(location);
-//in order to send a file like image we need to use formData
+
     let hotelData = new FormData();
     hotelData.append("title", title);
     hotelData.append("content", content);
@@ -48,25 +52,20 @@ const NewHotel = () => {
     hotelData.append("to", to);
     hotelData.append("bed", bed);
 
-  /*   console.log([...hotelData]);
- */
     try {
-        let res = await createHotel(token, hotelData);
-        console.log("HOTEL CREATE RES", res);
-        toast.success("New hotel is posted");
-        setTimeout(() => {
-          window.location.reload();
-        }, 1000);
-      } catch (err) {
-        console.log(err);
-        toast.error(err.response.data);
-      }
+      let res = await updateHotel(token, hotelData, match.params.hotelId);
+      console.log("HOTEL UPDATE RES", res);
+      toast.success(`${res.data.title} is updated`);
+    } catch (err) {
+      console.log(err);
+      toast.error(err.response.data.err);
+    }
   };
 
   const handleImageChange = (e) => {
     // console.log(e.target.files[0]);
     setPreview(URL.createObjectURL(e.target.files[0]));
-    setValues({ ...values, image: e.target.files[0] });
+    setImage(e.target.files[0]);
   };
 
   const handleChange = (e) => {
@@ -75,21 +74,19 @@ const NewHotel = () => {
 
   return (
     <>
-        <div className="container-fluid bg-secondary p-5 text-center">
-        <h2>Add Hotel</h2>
+      <div className="container-fluid bg-secondary p-5 text-center">
+        <h2>Edit Hotel</h2>
       </div>
       <div className="container-fluid">
         <div className="row">
           <div className="col-md-10">
             <br />
-            <HotelCreateForm
+            <HotelEditForm
               values={values}
               setValues={setValues}
               handleChange={handleChange}
               handleImageChange={handleImageChange}
               handleSubmit={handleSubmit}
-              location={location}
-              setLocation={setLocation}
             />
           </div>
           <div className="col-md-2">
@@ -99,7 +96,6 @@ const NewHotel = () => {
               className="img img-fluid m-2"
             />
             <pre>{JSON.stringify(values, null, 4)}</pre>
-            {JSON.stringify(location)}
           </div>
         </div>
       </div>
@@ -107,4 +103,4 @@ const NewHotel = () => {
   );
 };
 
-export default NewHotel;
+export default EditHotel;

@@ -1,12 +1,38 @@
-import { userSelector, useSelector, useStore } from "react-redux";
-
-
+import { useState, useEffect } from "react";
+import { allHotels } from "../api/hotel";
+import SmallCard from "../components/cards/SmallCard";
+import Search from "../components/forms/Search";
 
 const Home = () => {
-    const { user } = useSelector((state) => ({ ...state }));
+  const [hotels, setHotels] = useState([]);
 
-    return <div className="container-fluid h1 p-5 text-center">{JSON.stringify(user)} </div>;
+  useEffect(() => {
+    loadAllhotels();
+  }, []);
+
+ 
+  const loadAllhotels = async () => {
+    let res = await allHotels();
+    setHotels(res.data);
   };
-  
-  export default Home;
-  
+
+  return (
+    <>
+      <div className="container-fluid bg-secondary p-5 text-center">
+        <h1>All Hotels</h1>
+      </div>
+      <div className="col">
+        <br />
+        <Search />
+      </div>
+      <div className="container-fluid">
+      
+        {hotels.map((h) => (
+          <SmallCard key={h._id} h={h} />
+        ))}
+      </div>
+    </>
+  );
+};
+
+export default Home;
